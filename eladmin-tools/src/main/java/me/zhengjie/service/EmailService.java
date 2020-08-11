@@ -15,6 +15,8 @@
  */
 package me.zhengjie.service;
 
+import io.jstack.sendcloud4j.SendCloud;
+import io.jstack.sendcloud4j.mail.Result;
 import me.zhengjie.domain.vo.EmailVo;
 import me.zhengjie.domain.EmailConfig;
 import org.springframework.scheduling.annotation.Async;
@@ -27,8 +29,9 @@ public interface EmailService {
 
     /**
      * 更新邮件配置
+     *
      * @param emailConfig 邮箱配置
-     * @param old /
+     * @param old         /
      * @return /
      * @throws Exception /
      */
@@ -36,15 +39,27 @@ public interface EmailService {
 
     /**
      * 查询配置
+     *
      * @return EmailConfig 邮件配置
      */
     EmailConfig find();
 
     /**
      * 发送邮件
-     * @param emailVo 邮件发送的内容
+     *
+     * @param emailVo     邮件发送的内容
      * @param emailConfig 邮件配置
      * @throws Exception /
      */
     void send(EmailVo emailVo, EmailConfig emailConfig);
+
+    /**
+     * @param apiUser apiUser
+     * @param apiKey  apiKey
+     * @throws Exception /
+     */
+    SendCloud getKey(String apiUser, String apiKey);
+
+    Result sendEmail(EmailVo emailVo, EmailConfig emailConfig);
+
 }

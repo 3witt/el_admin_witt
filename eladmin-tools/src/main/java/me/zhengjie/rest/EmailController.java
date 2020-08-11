@@ -22,6 +22,7 @@ import me.zhengjie.annotation.Log;
 import me.zhengjie.domain.vo.EmailVo;
 import me.zhengjie.domain.EmailConfig;
 import me.zhengjie.service.EmailService;
+import me.zhengjie.utils.EmailUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 发送邮件
+ *
  * @author 郑杰
  * @date 2018/09/28 6:55:53
  */
@@ -41,23 +43,25 @@ public class EmailController {
     private final EmailService emailService;
 
     @GetMapping
-    public ResponseEntity<Object> queryConfig(){
-        return new ResponseEntity<>(emailService.find(),HttpStatus.OK);
+    public ResponseEntity<Object> queryConfig() {
+        return new ResponseEntity<>(emailService.find(), HttpStatus.OK);
     }
 
     @Log("配置邮件")
     @PutMapping
     @ApiOperation("配置邮件")
     public ResponseEntity<Object> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
-        emailService.config(emailConfig,emailService.find());
+        emailService.config(emailConfig, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Log("发送邮件")
     @PostMapping
     @ApiOperation("发送邮件")
-    public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo){
-        emailService.send(emailVo,emailService.find());
+    public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo) {
+        emailService.send(emailVo, emailService.find());
+//        EmailUtil.sendMail(emailVo, emailService.find());
+//        emailService.sendEmail(emailVo, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
