@@ -29,11 +29,15 @@ import me.zhengjie.modules.system.service.dto.JjLatestNetWorthDto;
 import me.zhengjie.modules.system.service.dto.JjRealTimeDynamicDto;
 import me.zhengjie.utils.DateUtils;
 import me.zhengjie.utils.JjUtil;
+import me.zhengjie.utils.ParamsUtil;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -86,7 +90,15 @@ public class TestTask {
      * @description
      * @date 11:21 2020/8/6
      */
-    public void updateAllJj() {
+    public void updateAllJj(String params) {
+        // 参数处理
+        log.info("参数：" + params);
+        Map<String, Object> mapParams = ParamsUtil.taskParams(params);
+
+        if (mapParams != null && mapParams.get("删除所有").equals("是")) {
+            jjDataService.deleteAll();
+        }
+
         String urlString = "http://fund.eastmoney.com/js/fundcode_search.js";
         String infoString = JjUtil.getJjRealTimeDynamic(urlString);
         if (infoString == null || infoString.length() <= 0 || infoString.equals("var r = []")) {
@@ -95,20 +107,36 @@ public class TestTask {
         infoString = infoString.replace("var r = ", "");
         infoString = infoString.replace(";", "");
         List<String[]> infoList = JSONArray.parseArray(infoString, String[].class);
-        for (String[] stringList : infoList
-        ) {
+
+        List<JjData> jjDatas = new ArrayList<>();
+        for (String[] stringList : infoList) {
             JjData jjData = new JjData();
             jjData.setJjCode(stringList[0]);
             jjData.setJjName(stringList[2]);
             jjData.setJjType(stringList[3]);
-            log.info(JSON.toJSONString(jjData));
-            try {
-                JjDataDto jjDataDto = jjDataService.create(jjData);
-                log.info(JSON.toJSONString(jjDataDto));
-            } catch (Exception e) {
-                log.error(e.getMessage());
+            JjData jjData1 = jjDataService.findByJjCode(stringList[0]);
+            if (jjData1 != null) {
                 continue;
             }
+            log.debug(JSON.toJSONString(jjData));
+            jjDatas.add(jjData);
+//            try {
+//                JjDataDto jjDataDto = jjDataService.create(jjData);
+//                log.info(JSON.toJSONString(jjDataDto));
+//            } catch (Exception e) {
+//                log.error(e.getMessage());
+//                continue;
+//            }
+        }
+        try {
+            long start = System.currentTimeMillis();
+            log.info("----------------插入数据数量：" + String.valueOf(jjDatas.size()));
+            List<JjData> res = jjDataService.saveAll(jjDatas);
+            long finish = System.currentTimeMillis();
+            long timeElapsed = finish - start;
+            log.info("耗时：" + timeElapsed);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -119,14 +147,20 @@ public class TestTask {
      * @description
      * @date 13:36 2020/8/5
      */
-    public void getJjTodayValue() {
-        // 判断今天是不是周六日，如果是，直接退出
-        try {
-            if (DateUtils.isWeekend(new Date())) {
-                return;
+    public void getJjTodayValue(String params) {
+        // 参数处理
+        log.info("参数：" + params);
+        Map<String, Object> mapParams = ParamsUtil.taskParams(params);
+
+        if (mapParams != null && mapParams.get("手动").equals("否")) {
+            // 判断今天是不是周六日，如果是，直接退出
+            try {
+                if (DateUtils.isWeekend(new Date())) {
+                    return;
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         log.info("非周末");
         int pageNumber = 0;
@@ -181,10 +215,15 @@ public class TestTask {
      * @description
      * @date 10:14 2020/8/7
      */
-    public void getYesterdayInfo() {
-        // 判断今天是不是周日，如果是，直接退出
-        if (DateUtils.isSunDay()) {
-            return;
+    public void getYesterdayInfo(String params) {
+        // 参数处理
+        log.info("参数：" + params);
+        Map<String, Object> mapParams = ParamsUtil.taskParams(params);
+        if (mapParams != null && mapParams.get("手动").equals("否")) {
+            // 判断今天是不是周日，如果是，直接退出
+            if (DateUtils.isSunDay()) {
+                return;
+            }
         }
         log.info("非周末");
         int pageNumber = 0;

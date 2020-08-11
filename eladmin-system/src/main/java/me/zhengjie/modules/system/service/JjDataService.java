@@ -18,7 +18,6 @@ package me.zhengjie.modules.system.service;
 import me.zhengjie.modules.system.domain.JjData;
 import me.zhengjie.modules.system.service.dto.JjDataDto;
 import me.zhengjie.modules.system.service.dto.JjDataQueryCriteria;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -94,4 +93,10 @@ public interface JjDataService {
     List<JjData> findAll();
 
     Page<JjData> findAll(Pageable pageable);
+
+    List<JjData> saveAll(List<JjData> jjDatas);
+
+    JjData findByJjCode(String s);
+
+    void deleteAll();
 }

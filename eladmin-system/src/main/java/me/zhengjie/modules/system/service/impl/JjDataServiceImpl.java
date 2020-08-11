@@ -25,7 +25,6 @@ import me.zhengjie.modules.system.service.JjDataService;
 import me.zhengjie.modules.system.service.dto.JjDataDto;
 import me.zhengjie.modules.system.service.dto.JjDataQueryCriteria;
 import me.zhengjie.modules.system.service.mapstruct.JjDataMapper;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -128,4 +127,20 @@ public class JjDataServiceImpl implements JjDataService {
     public Page<JjData> findAll(Pageable pageable) {
         return jjDataRepository.findAll(pageable);
     }
+
+    @Override
+    public List<JjData> saveAll(List<JjData> jjDatas) {
+        return jjDataRepository.saveAll(jjDatas);
+    }
+
+    @Override
+    public JjData findByJjCode(String jjCode) {
+        return jjDataRepository.findByJjCode(jjCode);
+    }
+
+    @Override
+    public void deleteAll() {
+        jjDataRepository.deleteAll();
+    }
+
 }

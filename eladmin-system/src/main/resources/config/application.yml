@@ -17,6 +17,11 @@ spring:
   jpa:
     properties:
       hibernate:
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
         ddl-auto: none
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: true
